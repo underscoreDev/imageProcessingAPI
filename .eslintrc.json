@@ -12,6 +12,20 @@
   "plugins": ["@typescript-eslint"],
   "rules": {
     "linebreak-style": ["error", "windows"],
-    "quotes": ["error", "double"]
+    "quotes": ["error", "double"],
+    "object-curly-spacing": ["error", "always"],
+    "new-cap": ["error", { "capIsNew": false }],
+    "indent": ["error", 2, { "FunctionExpression": { "parameters": "first" } }],
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "never",
+        "objects": "always",
+        "imports": "never",
+        "exports": "never",
+        "functions": "never"
+      }
+    ],
+    "max-len": ["error", { "code": 100 }]
   }
 }
