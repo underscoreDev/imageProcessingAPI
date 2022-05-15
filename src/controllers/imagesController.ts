@@ -1,5 +1,6 @@
+import sharp from "sharp";
+import { promises as fs } from "fs";
 import { NextFunction, Request, Response } from "express";
-// import sharp from "sharp";
 
 export const checkUrl = (req: Request, res: Response, next: NextFunction) => {
   if (!req.query.filename && !req.query.width && !req.query.height) {
@@ -10,9 +11,31 @@ export const checkUrl = (req: Request, res: Response, next: NextFunction) => {
   }
   next();
 };
-// ?filename=argentina&width=300&height=300
 
-export const resizeImage = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.query);
-  res.send("It works");
+export const resizeImage = async (req: Request, _res: Response, next: NextFunction) => {
+  try {
+    const filename = req.query.filename;
+    console.log(filename);
+    const width = Number(req.query.width);
+    const height = Number(req.query.height);
+    const file = await fs.readFile(`assets/full/${filename}.jpg`);
+
+    await sharp(file).resize(width, height).toFormat("jpeg").toFile(`assets/thumb/${filename}.jpg`);
+    next();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const sendImage = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const filename = req.query.filename;
+
+    const resizedImage = await fs.readFile(`assets/thumb/${filename}.jpg`);
+
+    res.end(resizedImage);
+    next();
+  } catch (error) {
+    throw error;
+  }
 };
