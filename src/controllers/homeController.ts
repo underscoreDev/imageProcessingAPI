@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 
-export const getHomePage = (req: Request, res: Response) => {
+export const getHomePage = (_req: Request, res: Response) => {
   return res.status(200).json({
     status: "success",
-    data: "Hello from the Home route",
+    message: "Welcome to Udacity's Image Processing API",
   });
 };

@@ -1,8 +1,22 @@
 import express from "express";
-import { checkUrl, resizeImage, sendImage } from "../controllers/imagesController";
+import {
+  checkUrl,
+  sendImage,
+  resizeImage,
+  checkIfImageHasBeenProcessed,
+  checkIfImageExistsInAssetsFolder,
+} from "../controllers/imagesController";
 
 const imagesRouter = express.Router();
 
-imagesRouter.route("/").get(checkUrl, resizeImage, sendImage);
+imagesRouter
+  .route("/")
+  .get(
+    checkUrl,
+    checkIfImageExistsInAssetsFolder,
+    checkIfImageHasBeenProcessed,
+    resizeImage,
+    sendImage
+  );
 
 export default imagesRouter;

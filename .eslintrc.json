@@ -11,7 +11,7 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "linebreak-style": ["error", "windows"],
+    "linebreak-style": ["error", "unix"],
     "quotes": ["error", "double"],
     "object-curly-spacing": ["error", "always"],
     "new-cap": ["error", { "capIsNew": false }],
@@ -19,9 +19,9 @@
     "comma-dangle": [
       "error",
       {
-        "arrays": "never",
-        "objects": "always",
-        "imports": "never",
+        "arrays": "always",
+        "objects": "only-multiline",
+        "imports": "only-multiline",
         "exports": "never",
         "functions": "never"
       }
