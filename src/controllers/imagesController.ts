@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from "express";
 export const checkUrl = (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.query.filename && !req.query.width && !req.query.height) {
-      return res.status(403).json({
+      return res.status(400).json({
         status: "Failed",
         data: "One of the following query parameters is missing (filename, width, height)",
       });
@@ -30,7 +30,7 @@ export const checkIfImageExistsInAssetsFolder = async (
       next();
     }
   } catch (error) {
-    return res.status(403).json({
+    return res.status(400).json({
       status: "Failed",
       data: "No such file exists",
     });
@@ -54,20 +54,27 @@ export const checkIfImageHasBeenProcessed = async (
   }
 };
 
+export const sharpProcessing = async (
+  filename: string | false,
+  width: number,
+  height: number
+): Promise<sharp.OutputInfo> => {
+  const absPath = process.env.PWD?.replace("build", "");
+
+  const file = await fs.readFile(`${absPath}/assets/full/${filename}.jpg`);
+
+  return await sharp(file)
+    .resize(width, height)
+    .toFormat("jpeg")
+    .toFile(`${absPath}/assets/thumb/${filename}.jpg`);
+};
+
 export const resizeImage = async (req: Request, _res: Response, next: NextFunction) => {
   try {
-    const filename = req.query.filename;
+    const filename = typeof req.query.filename === "string" && req.query.filename;
     const width = Number(req.query.width);
     const height = Number(req.query.height);
-    const absPath = process.env.PWD?.replace("build", "");
-
-    const file = await fs.readFile(`${absPath}/assets/full/${filename}.jpg`);
-
-    await sharp(file)
-      .resize(width, height)
-      .toFormat("jpeg")
-      .toFile(`${absPath}/assets/thumb/${filename}.jpg`);
-
+    await sharpProcessing(filename, width, height);
     next();
   } catch (error) {
     throw error;

@@ -5,7 +5,7 @@ import imagesRouter from "./routes/imagesRouter";
 
 export const app: Express = express();
 
-const port = 9889;
+export const port = 9889;
 
 const routes: Routes[] = [
   { route: "/", router: homeRouter },
