@@ -36,6 +36,7 @@ export const checkIfImageExistsInAssetsFolder = async (
     });
   }
 };
+
 export const checkIfImageHasBeenProcessed = async (
   req: Request,
   res: Response,
