@@ -7,32 +7,22 @@ const imagesFullPath = path.resolve(__dirname, "../../assets/full");
 const imagesThumbPath = path.resolve(__dirname, "../../assets/thumb");
 
 export const checkUrl = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    if (!req.query.filename && !req.query.width && !req.query.height) {
-      return res.status(400).json({
-        status: "Failed",
-        data: "One of the following query parameters is missing (filename, width, height)",
-      });
-    }
+  if (!req.query.filename || !req.query.width || !req.query.height) {
+    return res.status(400).json({
+      status: "Failed",
+      data: "One of the following query parameters is missing (filename, width, height)",
+    });
+  } else {
     next();
-  } catch (error) {
-    throw error;
   }
 };
 
 export const checkWidthAndHeight = (req: Request, res: Response, next: NextFunction) => {
   const { width, height } = req.query;
 
-  try {
-    if (Number(width) && Number(height)) {
-      next();
-    } else {
-      return res.status(400).json({
-        status: "Failed",
-        data: "Either width or height is not a valid number",
-      });
-    }
-  } catch (error) {
+  if (Number(width) && Number(height)) {
+    next();
+  } else {
     return res.status(400).json({
       status: "Failed",
       data: "Either width or height is not a valid number",
