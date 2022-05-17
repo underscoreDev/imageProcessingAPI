@@ -62,11 +62,13 @@ export const checkIfImageHasBeenProcessed = async (
   res: Response,
   next: NextFunction
 ) => {
-  const filename = req.query.filename;
+  const { filename, width, height } = req.query;
   const absPath = process.env.PWD?.replace("build", "");
 
   try {
-    const alreadyProcessedImage = await fs.readFile(`${absPath}/assets/thumb/${filename}.jpg`);
+    const alreadyProcessedImage = await fs.readFile(
+      `${absPath}/assets/thumb/${filename}_${width}_${height}.jpg`
+    );
     if (alreadyProcessedImage) {
       res.status(200).end(alreadyProcessedImage);
     }
@@ -87,7 +89,7 @@ export const sharpProcessing = async (
   return await sharp(file)
     .resize(width, height)
     .toFormat("jpeg")
-    .toFile(`${absPath}/assets/thumb/${filename}.jpg`);
+    .toFile(`${absPath}/assets/thumb/${filename}_${width}_${height}.jpg`);
 };
 
 export const resizeImage = async (req: Request, _res: Response, next: NextFunction) => {
@@ -104,10 +106,12 @@ export const resizeImage = async (req: Request, _res: Response, next: NextFuncti
 
 export const sendImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const filename = req.query.filename;
+    const { filename, width, height } = req.query;
     const absPath = process.env.PWD?.replace("build", "");
 
-    const resizedImage = await fs.readFile(`${absPath}/assets/thumb/${filename}.jpg`);
+    const resizedImage = await fs.readFile(
+      `${absPath}/assets/thumb/${filename}_${width}_${height}.jpg`
+    );
 
     res.end(resizedImage);
     next();
