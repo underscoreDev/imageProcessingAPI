@@ -16,7 +16,27 @@ export const checkUrl = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export const checkIfImageExistsInAssetsFolder = async (
+export const checkWidthAndHeight = (req: Request, res: Response, next: NextFunction) => {
+  const { width, height } = req.query;
+
+  try {
+    if (Number(width) && Number(height)) {
+      next();
+    } else {
+      return res.status(400).json({
+        status: "Failed",
+        data: "Either width or height is not a valid number",
+      });
+    }
+  } catch (error) {
+    return res.status(400).json({
+      status: "Failed",
+      data: "Either width or height is not a valid number",
+    });
+  }
+};
+
+export const checkIfFilenameExistsInAssetsFullFolder = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -46,9 +66,10 @@ export const checkIfImageHasBeenProcessed = async (
   const absPath = process.env.PWD?.replace("build", "");
 
   try {
-    const resizedImage = await fs.readFile(`${absPath}/assets/thumb/${filename}.jpg`);
-    res.status(200).end(resizedImage);
-    next();
+    const alreadyProcessedImage = await fs.readFile(`${absPath}/assets/thumb/${filename}.jpg`);
+    if (alreadyProcessedImage) {
+      res.status(200).end(alreadyProcessedImage);
+    }
   } catch (error) {
     next();
   }

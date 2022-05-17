@@ -4,7 +4,8 @@ import {
   sendImage,
   resizeImage,
   checkIfImageHasBeenProcessed,
-  checkIfImageExistsInAssetsFolder,
+  checkIfFilenameExistsInAssetsFullFolder,
+  checkWidthAndHeight,
 } from "../controllers/imagesController";
 
 const imagesRouter = express.Router();
@@ -13,7 +14,8 @@ imagesRouter
   .route("/")
   .get(
     checkUrl,
-    checkIfImageExistsInAssetsFolder,
+    checkWidthAndHeight,
+    checkIfFilenameExistsInAssetsFullFolder,
     checkIfImageHasBeenProcessed,
     resizeImage,
     sendImage
