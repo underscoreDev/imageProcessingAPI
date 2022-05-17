@@ -62,6 +62,14 @@ The code can ba automatically linted using ESlint. Note that ESlint will also us
 npm run lint
 ```
 
+#### Run all
+
+After installling dependencies with `npm install` all scripts can run with `npm run run:all`, this will run the prettier, lint, build and test(Jasmine) scripts
+
+```
+npm run run:all
+```
+
 ---
 
 ## How to use
