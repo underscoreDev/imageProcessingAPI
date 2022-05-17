@@ -5,7 +5,6 @@ import path from "path";
 
 const imagesFullPath = path.resolve(__dirname, "../../assets/full/");
 const imagesThumbPath = path.resolve(__dirname, "../../assets/thumb/");
-console.log(imagesFullPath);
 
 export const checkUrl = (req: Request, res: Response, next: NextFunction) => {
   if (!req.query.filename || !req.query.width || !req.query.height) {
