@@ -1,10 +1,9 @@
 import express from "express";
 import {
   checkUrl,
-  sendImage,
   resizeImage,
   checkIfImageHasBeenProcessed,
-  checkIfFilenameExistsInAssetsFullFolder,
+  checkIfFileExistsInFullFolder,
   checkWidthAndHeight,
 } from "../controllers/imagesController";
 
@@ -15,10 +14,9 @@ imagesRouter
   .get(
     checkUrl,
     checkWidthAndHeight,
-    checkIfFilenameExistsInAssetsFullFolder,
+    checkIfFileExistsInFullFolder,
     checkIfImageHasBeenProcessed,
-    resizeImage,
-    sendImage
+    resizeImage
   );
 
 export default imagesRouter;

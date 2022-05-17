@@ -1,6 +1,10 @@
 import sharp from "sharp";
-import { promises as fs } from "fs";
+import fsSync, { promises as fs } from "fs";
 import { NextFunction, Request, Response } from "express";
+import path from "path";
+
+const imagesFullPath = path.resolve(__dirname, "../../assets/full");
+const imagesThumbPath = path.resolve(__dirname, "../../assets/thumb");
 
 export const checkUrl = (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -36,23 +40,21 @@ export const checkWidthAndHeight = (req: Request, res: Response, next: NextFunct
   }
 };
 
-export const checkIfFilenameExistsInAssetsFullFolder = async (
+export const checkIfFileExistsInFullFolder = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const filename = req.query.filename;
-  const absPath = process.env.PWD?.replace("build", "");
+  const { filename } = req.query;
+  const imageExists = `${imagesFullPath}/${filename}.jpg`;
+  const fileExists = fsSync.existsSync(imageExists);
 
-  try {
-    const file = await fs.readFile(`${absPath}/assets/full/${filename}.jpg`);
-    if (file) {
-      next();
-    }
-  } catch (error) {
-    return res.status(400).json({
-      status: "Failed",
-      data: "No such file exists",
+  if (fileExists) {
+    next();
+  } else {
+    return res.status(403).json({
+      message: "Failed",
+      data: "File doesn't exist",
     });
   }
 };
@@ -63,59 +65,38 @@ export const checkIfImageHasBeenProcessed = async (
   next: NextFunction
 ) => {
   const { filename, width, height } = req.query;
-  const absPath = process.env.PWD?.replace("build", "");
+  const alreadyProcessedImage = `${imagesThumbPath}/${filename}_${width}_${height}.jpg`;
+  const fileExists = fsSync.existsSync(alreadyProcessedImage);
 
-  try {
-    const alreadyProcessedImage = await fs.readFile(
-      `${absPath}/assets/thumb/${filename}_${width}_${height}.jpg`
-    );
-    if (alreadyProcessedImage) {
-      res.status(200).end(alreadyProcessedImage);
-    }
-  } catch (error) {
+  if (fileExists) {
+    const fileToBeSent = await fs.readFile(alreadyProcessedImage);
+    return res.status(200).end(fileToBeSent);
+  } else {
     next();
   }
 };
 
-export const sharpProcessing = async (
-  filename: string | false,
-  width: number,
-  height: number
-): Promise<sharp.OutputInfo> => {
-  const absPath = process.env.PWD?.replace("build", "");
-
-  const file = await fs.readFile(`${absPath}/assets/full/${filename}.jpg`);
-
-  return await sharp(file)
+export const sharpProcessing = async (filename: string | false, width: number, height: number) => {
+  const file = await fs.readFile(`${imagesFullPath}/${filename}.jpg`);
+  return sharp(file)
     .resize(width, height)
     .toFormat("jpeg")
-    .toFile(`${absPath}/assets/thumb/${filename}_${width}_${height}.jpg`);
+    .toFile(`${imagesThumbPath}/${filename}_${width}_${height}.jpg`);
 };
 
-export const resizeImage = async (req: Request, _res: Response, next: NextFunction) => {
+export const resizeImage = async (req: Request, res: Response, next: NextFunction) => {
+  const filename = typeof req.query.filename === "string" && req.query.filename;
+  const width = Number(req.query.width);
+  const height = Number(req.query.height);
+
   try {
-    const filename = typeof req.query.filename === "string" && req.query.filename;
-    const width = Number(req.query.width);
-    const height = Number(req.query.height);
-    await sharpProcessing(filename, width, height);
-    next();
+    const file = await sharpProcessing(filename, width, height);
+    const resizedImage = await fs.readFile(`${imagesThumbPath}/${filename}_${width}_${height}.jpg`);
+    file && resizedImage && res.end(resizedImage);
   } catch (error) {
-    throw error;
-  }
-};
-
-export const sendImage = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { filename, width, height } = req.query;
-    const absPath = process.env.PWD?.replace("build", "");
-
-    const resizedImage = await fs.readFile(
-      `${absPath}/assets/thumb/${filename}_${width}_${height}.jpg`
-    );
-
-    res.end(resizedImage);
-    next();
-  } catch (error) {
-    throw error;
+    res.status(403).json({
+      message: "Failed",
+      data: "Sorry image couldn't be processed",
+    });
   }
 };
