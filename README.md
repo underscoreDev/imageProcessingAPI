@@ -1,4 +1,4 @@
-# Image Processing API - Udacity's Fullstack JavaScript Developer Nanodegree
+# Image Processing API
 
 ## Introduction
 
