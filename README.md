@@ -38,7 +38,7 @@ The following actions can be executed through npm scripts:
 npm run build
 ```
 
-The transpiled code will be available in the `build` folder.
+The transpiled code will be available in a `build` folder.
 
 #### Testing
 
